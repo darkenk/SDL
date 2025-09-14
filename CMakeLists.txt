@@ -6,12 +6,14 @@ endif()
 
 # See docs/release_checklist.md
 project(SDL3 LANGUAGES C CXX VERSION "3.3.0")
+option(DISABLE_PCH "disable pch for better cache utilization while compiling with ccache" ON)
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   set(SDL3_MAINPROJECT ON)
 else()
   set(SDL3_MAINPROJECT OFF)
 endif()
+
 
 # Add UTF-8 encoding support for MSVC compiler.
 # This ensures that the MSVC compiler interprets source files as UTF-8 encoded,
@@ -3569,7 +3571,7 @@ if(SDL_SHARED)
   set_property(TARGET SDL3-shared PROPERTY INTERFACE_SDL3_SHARED TRUE)
   set_property(TARGET SDL3-shared APPEND PROPERTY COMPATIBLE_INTERFACE_STRING "SDL_VERSION")
   set_property(TARGET SDL3-shared PROPERTY INTERFACE_SDL_VERSION "SDL${SDL3_VERSION_MAJOR}")
-  if(NOT CMAKE_VERSION VERSION_LESS "3.16")
+  if(NOT CMAKE_VERSION VERSION_LESS "3.16" AND NOT DISABLE_PCH)
     target_precompile_headers(SDL3-shared PRIVATE "$<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:${PROJECT_SOURCE_DIR}/src/SDL_internal.h>")
   endif()
 endif()
@@ -3593,7 +3595,7 @@ if(SDL_STATIC)
   set_property(TARGET SDL3-static PROPERTY INTERFACE_SDL3_SHARED FALSE)
   set_property(TARGET SDL3-static APPEND PROPERTY COMPATIBLE_INTERFACE_STRING "SDL_VERSION")
   set_property(TARGET SDL3-static PROPERTY INTERFACE_SDL_VERSION "SDL${SDL3_VERSION_MAJOR}")
-  if(NOT CMAKE_VERSION VERSION_LESS "3.16")
+  if(NOT CMAKE_VERSION VERSION_LESS "3.16" AND NOT DISABLE_PCH)
     target_precompile_headers(SDL3-static PRIVATE "$<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:${PROJECT_SOURCE_DIR}/src/SDL_internal.h>")
   endif()
 endif()
